@@ -8,7 +8,7 @@ import Home from './components/Home.js'
 
 function App() {
 
-    const URL_BACK = "http://localhost:5000";
+    const URL_BACK = "https://projeto14-drivenshoes.herokuapp.com";
 
     return (
         <BrowserRouter>
