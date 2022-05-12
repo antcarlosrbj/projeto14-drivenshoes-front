@@ -5,44 +5,36 @@ import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
 
 
-export default function SignUp({ URL_BACK }) {
+export default function Login({ URL_BACK, setToken }) {
 
-    const [name, setName] = useState("")
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = React.useState("");
-    const [erro, setErro] = useState(<p></p>); //Usuário e/ou senha incorretos
+    const [erro, setErro] = useState(<p></p>); //Usuário e/ou senha incorretos;
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    function signUpForm(event) {
+    function loginForm(event) {
         event.preventDefault();
-
-        if (password !== confirmPassword) {
-            setErro(<p>As duas senhas devem ser iguais</p>);
-            return;
-        }
 
         setLoading(true);
 
-        const promisse = axios.post(URL_BACK + "/sign-up", {
-            name: name,
+        const promisse = axios.post(URL_BACK + "/login", {
             email: email,
             password: password
         })
 
         promisse.then(res => {
             setLoading(false);
-            navigate("/login");
+            setToken(res.data);
+            localStorage.setItem("token", res.data);
+            navigate("/");
         });
 
         promisse.catch(error => {
             setLoading(false);
-            if (error.response.status === 400) {
-                setErro(<p>A senha deve conter no mínimo 8 dígitos</p>);
-            } else if (error.response.status === 409) {
-                setErro(<p>Esse e-mail já foi cadastrado</p>);
+            if (error.response.status === 401) {
+                setErro(<p>Usuário e/ou senha incorretos</p>);
             } else {
                 alert("Infelizmente, não foi possível realizar o cadastro. Tente novamente mais tarde.");
             }
@@ -52,22 +44,20 @@ export default function SignUp({ URL_BACK }) {
     }
 
     return (
-        <SignUpStyle>
+        <LoginStyle>
             <h1>DrivenShoes</h1>
-            <form onSubmit={signUpForm}>
-                <input type="text" value={name} placeholder="Nome" onChange={e => setName(e.target.value)} required />
+            <form onSubmit={loginForm}>
                 <input type="email" value={email} placeholder="E-mail" onChange={e => setEmail(e.target.value)} required />
                 <input type="password" value={password} placeholder="Senha" onChange={e => setPassword(e.target.value)} required />
-                <input type="password" value={confirmPassword} placeholder="Confirme a Senha" onChange={e => setConfirmPassword(e.target.value)} required />
-                <button type="submit">{loading ? <ThreeDots {...{ color: "white" }} /> : "Cadastrar"}</button>
+                <button type="submit">{loading ? <ThreeDots {...{ color: "white" }} /> : "Entrar"}</button>
             </form>
             {erro}
-            <Link to="/login">Já tem uma conta? Entre agora!</Link>
-        </SignUpStyle>
+            <Link to="/sign-up">Primeira vez? Cadastre-se!</Link>
+        </LoginStyle>
     )
 }
 
-const SignUpStyle = styled.div`
+const LoginStyle = styled.div`
     width: 100vw;
     height: 100vh;
     background-color: #5B2E82;
