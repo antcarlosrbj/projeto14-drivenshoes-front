@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from 'styled-components';
 import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
 
 
-export default function Login({ URL_BACK, setToken }) {
+export default function Login({ URL_BACK, token, setToken }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -42,6 +42,24 @@ export default function Login({ URL_BACK, setToken }) {
         });
 
     }
+
+    useEffect(() => {
+        
+        const promiseToken = axios.get(URL_BACK + "/login", {
+            headers: {
+                "authorization": `Bearer ${token}`
+            }
+        })
+
+        promiseToken.then(res => {
+            navigate("/");
+        });
+
+        promiseToken.catch(error => {
+            console.log(error);
+        });
+       
+    }, []);
 
     return (
         <LoginStyle>
